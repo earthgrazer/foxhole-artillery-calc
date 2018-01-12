@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Foxhole Artillery Calculator</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+</head>
+<body>
+    <section>
+        <h2>Target</h2>
+        <div>
+            <label for="input_tar_dist">Distance</label>
+            <input id="input_tar_dist" type="number" placeholder="from spotter to target" autofocus>
+        </div>
+        <div>
+            <label for="input_tar_azim">Azimuth</label>
+            <input id="input_tar_azim" type="number" placeholder="from spotter to target">
+        </div>
+    </section>
+    <section>
+        <h2>Artillery</h2>
+        <div>
+            <label for="input_art_dist">Distance</label>
+            <input id="input_art_dist" type="number" placeholder="from spotter to artillery">
+        </div>
+        <div>
+            <label for="input_art_azim">Azimuth</label>
+            <input id="input_art_azim" type="number" placeholder="from spotter to artillery">
+        </div>
+    </section>
+    <section>
+        <button id="btn_compute" type="button">Compute</button>
+        <button id="btn_clear_tar" type="button">Clear Target</button>
+        <button id="btn_clear" type="button">Clear All</button>
+        <button id="btn_info" type="button">Info</button>
+    </section>
+    <section id="sec_info">
+        <h2>Information</h2>
+        <p>To use this calculator:</p>
+        <ol>
+            <li>Have a spotter determine the distance and azimuth to the target location.</li>
+            <li>Without moving, have the spotter determine the distance and azimuth to the artillery location.</li>
+            <li>Input the two sets of values, and the computed result is the distance and azimuth from the artillery to the target.</li>
+            <li>Adjust the artillery settings to match the resulting values, then fire!</li>
+        </ol>
+        <p>The <strong>In-game values</strong> in the result are rounded to match the in-game increments.</p>
+        <p>Please report bugs and suggestions <a href="https://github.com/earthgrazer/foxhole-artillery-calc/issues" target="_blank">here</a>.</p>
+    </section>
+    <section id="sec_result">
+        <h2>Result</h2>
+        <div id="raw_result_div"></div>
+        <div id="est_result_div"></div>
+    </section>
+    <script
+            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="./js/artycalc.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#btn_compute").click(function() {
+                var tar_dist = parseFloat($("#input_tar_dist").val());
+                var tar_azim = parseFloat($("#input_tar_azim").val());
+                var art_dist = parseFloat($("#input_art_dist").val());
+                var art_azim = parseFloat($("#input_art_azim").val());
+                var result = artycal.calc_artillery(tar_dist, tar_azim, art_dist, art_azim);
+                $("#raw_result_div").html("Raw values: [Distance: " + result.art_tar_dist + ", Azimuth: " + result.art_tar_deg + "]");
+                $("#est_result_div").html("<strong>In-game values: [Distance: " + artycal.roundTo5(result.art_tar_dist) + "m, Azimuth: " + Math.round(result.art_tar_deg) + "]</strong>");
+                $("#sec_result").show();
+                $("#sec_info").hide();
+            });
+
+            $("#btn_clear").click(function() {
+                $("#input_tar_dist").val("").focus();
+                $("#input_tar_azim").val("");
+                $("#input_art_dist").val("");
+                $("#input_art_azim").val("");
+            });
+
+            $("#btn_clear_tar").click(function() {
+                $("#input_tar_dist").val("").focus();
+                $("#input_tar_azim").val("");
+            });
+
+            $("#btn_info").click(function() {
+                $("#sec_result").hide();
+                $("#sec_info").show();
+            });
+
+            $("input").focus(function() {
+                $(this).select();
+            });
+
+            $("#sec_result").hide();
+        });
+    </script>
+</body>
+</html>
