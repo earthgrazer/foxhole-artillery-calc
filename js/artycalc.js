@@ -56,6 +56,10 @@ var artycal = (function() {
      * @returns {{art_tar_dist: number, art_tar_deg: number}}
      */
     inst.calc_artillery = function(tar_dist, tar_azim, art_dist, art_azim) {
+        if (isNaN(tar_dist) || isNaN(tar_azim) || isNaN(art_dist) || isNaN(art_azim)) {
+            return {error: true};
+        }
+
         // convert polar coordinates of target and artillery to cartesian
         var tar_coord = azim_to_cart(tar_dist, tar_azim);
         var art_coord = azim_to_cart(art_dist, art_azim);
@@ -67,8 +71,11 @@ var artycal = (function() {
 
         // calculate distance from artillery to target
         var art_tar_dist = Math.sqrt(Math.pow(art_coord.x - tar_coord.x, 2) + Math.pow(art_coord.y - tar_coord.y, 2));
-        // calculate
-        var art_tar_deg = to_degrees(Math.asin(Math.abs(tar_coord.x) / art_tar_dist));
+        // calculate azimuth from artiller to target
+        var art_tar_deg = 0;
+        if (art_tar_dist > 0) {
+            art_tar_deg = to_degrees(Math.asin(Math.abs(tar_coord.x) / art_tar_dist));
+        }
 
         // adjust degrees based on what quadrant the target is located relative to the artillery
         if (tar_coord.x < 0 && tar_coord.y >= 0) {
@@ -82,6 +89,10 @@ var artycal = (function() {
         else if (tar_coord.x >= 0 && tar_coord.y < 0) {
             // Target is in fourth quadrant
             art_tar_deg = 180 - art_tar_deg;
+        }
+
+        if (isNaN(art_tar_dist) || isNaN(art_tar_deg)) {
+            return {error: true};
         }
 
         return {art_tar_dist: art_tar_dist, art_tar_deg: art_tar_deg};
