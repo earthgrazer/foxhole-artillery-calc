@@ -26,6 +26,7 @@
                 <input id="input_tar_azim" type="number" placeholder="from spotter to target" class="form-control" aria-label="from spotter to target" tabindex="2">
                 <div class="input-group-append">
                     <span class="input-group-text">degrees</span>
+                    <button id="btn_swapcourse_tar_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
                 </div>
             </div>
         </section>
@@ -47,6 +48,7 @@
                 <input id="input_art_azim" type="number" placeholder="from spotter to artillery" class="form-control" aria-label="from spotter to artillery" tabindex="4">
                 <div class="input-group-append">
                     <span class="input-group-text">degrees</span>
+                    <button id="btn_swapcourse_art_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
                 </div>
             </div>
         </section>
@@ -102,6 +104,15 @@
 
                 $("#sec_result").show();
                 $("#sec_info").hide();
+            });
+            
+            $('#btn_swapcourse_tar_azim').click(function() {
+                var backcourse = artycal.get_backcourse( parseFloat($("#input_tar_azim").val()) );
+                $("#input_tar_azim").val( backcourse );
+            });
+            $('#btn_swapcourse_art_azim').click(function() {
+                var backcourse = artycal.get_backcourse( parseFloat($("#input_art_azim").val()) );
+                $("#input_art_azim").val( backcourse );
             });
 
             $("#btn_clear").click(function() {

@@ -30,6 +30,10 @@ var artycal = (function() {
         coords.y += matrix.y;
     }
 
+    inst.get_backcourse = function(degrees) {
+        return (degrees >= 180)? degrees-180 : degrees+180;;
+    }
+
     /**
      * Foxhole only allows distance adjustments in 5 meter increments. Round number to the nearest multiple of five.
      * @param num Number to round
