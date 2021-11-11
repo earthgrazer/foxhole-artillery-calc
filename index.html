@@ -55,6 +55,7 @@
                     <span class="input-group-text" style="width:5.5em">Azimuth</span>
                 </div>
                 <input id="input_art_azim" type="number" class="form-control" tabindex="101">
+                <input id="input_art_corr" type="number" class="form-control" tabindex="102" placeholder="Correction in m (negative=left, optional)" aria-label="Correction in m (negative=left, optional)">
                 <div class="input-group-append">
                     <span class="input-group-text">degrees</span>
                     <button id="btn_swapcourse_art_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
@@ -89,6 +90,7 @@
                 <li>Have a spotter determine the distance and azimuth to the target location.</li>
                 <li>Without moving, have the spotter determine the distance and azimuth to the artillery location.</li>
                 <li>Input the two sets of values, and the computed result is the distance and azimuth from the artillery to the target.</li>
+                <li>The optional left/right correction can be entered as viewed from the gun in meters. Negative values indicate correction to the left.</li>
                 <li>Adjust the artillery settings to match the resulting values, then fire!</li>
                 <li>You can optionally insert linked Target Reference Points between the spotter and the arty, this allows for spotting beyond binocular range.</li>
             </ol>
@@ -100,8 +102,8 @@
         </section>
         <section id="sec_result">
             <h2 style="font-size:20pt">Result</h2>
-            <div id="raw_result_div"></div>
             <div id="est_result_div"></div>
+            <div id="raw_result_div" style="font-size:small"></div>
         </section>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
@@ -167,7 +169,18 @@
                     $("#est_result_div").html("");
                 }
                 else {
-                    $("#raw_result_div").html("Raw values: [Distance: " + (Math.round(result.art_tar_dist*100)/100) + ", Azimuth: " + (Math.round(result.art_tar_deg*100)/100) + "]");
+                    // apply optional correction
+                    var corr        = parseFloat($("#input_art_corr").val());
+                    var corr_1deg   = artycal.getOpAngleDist(result.art_tar_dist, 1.0);
+                    var corr_mToDeg = 0;
+                    if (!isNaN(corr)) {
+                        console.log("apply correction: %o", corr);
+                        corr_mToDeg = artycal.getCorrectionAngle(result.art_tar_dist, corr);
+                        result.art_tar_deg = result.art_tar_deg + corr_mToDeg;
+                    }
+                    
+                    // print results
+                    $("#raw_result_div").html("Raw values: [Distance: " + (Math.round(result.art_tar_dist*100)/100) + ", Azimuth: " + (Math.round((result.art_tar_deg-corr_mToDeg)*100)/100) + ", correction ("+Math.round(artycal.getOpAngleDist(result.art_tar_dist, 1.0)*100)/100+"m/1&deg;): "+((corr_mToDeg>0)?"+":"")+Math.round(corr_mToDeg*100)/100+"&deg;]");
                     var roundedResultAzim = Math.round(result.art_tar_deg);
                     if (roundedResultAzim == 360) roundedResultAzim = 0;
                     $("#est_result_div").html("<strong>In-game [Distance: " + artycal.roundTo5(result.art_tar_dist) + "m, Azimuth: " + roundedResultAzim + "]</strong>");
@@ -191,6 +204,7 @@
                 $("#input_tar_azim").val("");
                 $("#input_art_dist").val("");
                 $("#input_art_azim").val("");
+                $("#input_art_corr").val("");
                 for (var i=trp_list.length; i>0; i--) {
                     dropLastTRP();
                 };
@@ -341,7 +355,8 @@
                     },
                     art:{
                         dist:parseFloat($("#input_art_dist").val()),
-                        azim:parseFloat($("#input_art_azim").val())
+                        azim:parseFloat($("#input_art_azim").val()),
+                        corr:parseFloat($("#input_art_corr").val())
                     },
                     trps:[]
                 };
@@ -379,10 +394,15 @@
                 // restore spotter||trp -> arty leg
                 $("#input_art_dist").val(fp.art.dist);
                 $("#input_art_azim").val(fp.art.azim);
+                $("#input_art_corr").val(fp.art.corr);
                 
                 // when loading a firingplan, set it active
                 $("#firingplans_menu_btn").html(firingplans[id].name);
                 active_plan_id = id;
+                
+                // when loading a firingplan, clear previous results
+                $("#raw_result_div").html("");
+                $("#est_result_div").html("");
                 
                 updateFireplanSubmenuState();
             };

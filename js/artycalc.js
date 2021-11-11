@@ -33,6 +33,18 @@ var artycal = (function() {
     inst.get_backcourse = function(degrees) {
         return (degrees >= 180)? degrees-180 : degrees+180;;
     }
+    
+    // Calculate the length of the opposite angles side
+    // (ie: how long is the offset given an specific angle?)
+    inst.getOpAngleDist = function(distance, degrees) {
+        return distance * Math.tan(to_radians(degrees));
+    }
+    
+    // Calculate correction angle needed for a given dist
+    // (i.e. how many degrees to rotate to hit a corrected position)
+    inst.getCorrectionAngle = function(distanceToTGT, leftRightCorrection) {
+        return to_degrees(Math.atan(leftRightCorrection / distanceToTGT));
+    }
 
     /**
      * Foxhole only allows distance adjustments in 5 meter increments. Round number to the nearest multiple of five.
