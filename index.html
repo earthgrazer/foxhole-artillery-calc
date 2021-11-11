@@ -10,9 +10,9 @@
     <div class="container">
         <section>
             <h2>Target</h2>
-            <div class="input-group mb-3">
+            <div class="input-group mb-0">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Distance</span>
+                    <span class="input-group-text" style="width:5.5em">Distance</span>
                 </div>
                 <input id="input_tar_dist" type="number" class="form-control" tabindex="1" autofocus placeholder="from spotter to target" aria-label="from spotter to target">
                 <div class="input-group-append">
@@ -21,7 +21,7 @@
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Azimuth</span>
+                    <span class="input-group-text" style="width:5.5em">Azimuth</span>
                 </div>
                 <input id="input_tar_azim" type="number" class="form-control" tabindex="2" placeholder="from spotter to target" aria-label="from spotter to target">
                 <div class="input-group-append">
@@ -41,9 +41,9 @@
 
         <section>
             <h2>Artillery</h2>
-            <div class="input-group mb-3">
+            <div class="input-group mb-0">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Distance</span>
+                    <span class="input-group-text" style="width:5.5em">Distance</span>
                 </div>
                 <input id="input_art_dist" type="number" class="form-control" tabindex="100">
                 <div class="input-group-append">
@@ -52,7 +52,7 @@
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Azimuth</span>
+                    <span class="input-group-text" style="width:5.5em">Azimuth</span>
                 </div>
                 <input id="input_art_azim" type="number" class="form-control" tabindex="101">
                 <div class="input-group-append">
@@ -266,9 +266,9 @@
                 // prepare simple HTML template
                 var html_template = `<section id="trp_{newTRPid}">
                         <h2>Target Reference Point (TRP) #{newTRPid}</h2>
-                        <div class="input-group mb-3">
+                        <div class="input-group mb-0">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Distance</span>
+                                <span class="input-group-text" style="width:5.5em">Distance</span>
                             </div>
                             <input id="input_trp_{newTRPid}_dist" type="number" placeholder="-" class="form-control" aria-label="-" tabindex="{tabindex_dist}">
                             <div class="input-group-append">
@@ -277,7 +277,7 @@
                         </div>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Azimuth</span>
+                                <span class="input-group-text" style="width:5.5em">Azimuth</span>
                             </div>
                             <input id="input_trp_{newTRPid}_azim" type="number" placeholder="-" class="form-control" aria-label="-" tabindex="{tabindex_azim}">
                             <div class="input-group-append">
