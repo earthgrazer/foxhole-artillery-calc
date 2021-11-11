@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <section>
-            <h2>Target</h2>
+            <h2 style="font-size:20pt">Target</h2>
             <div class="input-group mb-0">
                 <div class="input-group-prepend">
                     <span class="input-group-text" style="width:5.5em">Distance</span>
@@ -40,7 +40,7 @@
         </section>
 
         <section>
-            <h2>Artillery</h2>
+            <h2 style="font-size:20pt">Artillery</h2>
             <div class="input-group mb-0">
                 <div class="input-group-prepend">
                     <span class="input-group-text" style="width:5.5em">Distance</span>
@@ -83,7 +83,7 @@
             <button id="btn_info" type="button" class="btn btn-outline-info">Info</button>
         </section>
         <section id="sec_info">
-            <h2>Information</h2>
+            <h2 style="font-size:20pt">Information</h2>
             <p>To use this calculator:</p>
             <ol>
                 <li>Have a spotter determine the distance and azimuth to the target location.</li>
@@ -99,7 +99,7 @@
             <p>Please report bugs and suggestions <a href="https://github.com/earthgrazer/foxhole-artillery-calc/issues" target="_blank">here</a>.</p>
         </section>
         <section id="sec_result">
-            <h2>Result</h2>
+            <h2 style="font-size:20pt">Result</h2>
             <div id="raw_result_div"></div>
             <div id="est_result_div"></div>
         </section>
@@ -167,10 +167,10 @@
                     $("#est_result_div").html("");
                 }
                 else {
-                    $("#raw_result_div").html("Raw values: [Distance: " + result.art_tar_dist + ", Azimuth: " + result.art_tar_deg + "]");
+                    $("#raw_result_div").html("Raw values: [Distance: " + (Math.round(result.art_tar_dist*100)/100) + ", Azimuth: " + (Math.round(result.art_tar_deg*100)/100) + "]");
                     var roundedResultAzim = Math.round(result.art_tar_deg);
                     if (roundedResultAzim == 360) roundedResultAzim = 0;
-                    $("#est_result_div").html("<strong>In-game values: [Distance: " + artycal.roundTo5(result.art_tar_dist) + "m, Azimuth: " + roundedResultAzim + "]</strong>");
+                    $("#est_result_div").html("<strong>In-game [Distance: " + artycal.roundTo5(result.art_tar_dist) + "m, Azimuth: " + roundedResultAzim + "]</strong>");
                 }
 
                 $("#sec_result").show();
@@ -265,7 +265,7 @@
                 
                 // prepare simple HTML template
                 var html_template = `<section id="trp_{newTRPid}">
-                        <h2>Target Reference Point (TRP) #{newTRPid}</h2>
+                        <h2 style="font-size:20pt">Target Reference Point (TRP) #{newTRPid}</h2>
                         <div class="input-group mb-0">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" style="width:5.5em">Distance</span>
