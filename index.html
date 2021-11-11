@@ -33,9 +33,9 @@
 
         <section>
             <hr/>
-            <div id="container_additional_trps"><!-- TODO: New TRPs go here --></div>
             <button id="btn_add_trp" class="btn btn-secondary btn-sm">+ Add Target Reference Point</button>
             <button id="btn_del_trp" class="btn btn-outline-danger btn-sm">- remove Target Reference Point</button>
+            <div id="container_additional_trps"><!-- Info: New TRPs stack up here --></div>
             <hr/>
         </section>
 
@@ -45,7 +45,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">Distance</span>
                 </div>
-                <input id="input_art_dist" type="number" class="form-control" tabindex="50">
+                <input id="input_art_dist" type="number" class="form-control" tabindex="100">
                 <div class="input-group-append">
                     <span class="input-group-text">meters</span>
                 </div>
@@ -54,7 +54,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">Azimuth</span>
                 </div>
-                <input id="input_art_azim" type="number" class="form-control" tabindex="51">
+                <input id="input_art_azim" type="number" class="form-control" tabindex="101">
                 <div class="input-group-append">
                     <span class="input-group-text">degrees</span>
                     <button id="btn_swapcourse_art_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
@@ -62,7 +62,7 @@
             </div>
         </section>
         <section>
-            <button id="btn_compute" type="button" class="btn btn-outline-primary" tabindex="60">Compute</button>
+            <button id="btn_compute" type="button" class="btn btn-outline-primary" tabindex="110">Compute</button>
             <button id="btn_clear_tar" type="button" class="btn btn-outline-secondary">Clear Target</button>
             <button id="btn_clear" type="button" class="btn btn-outline-secondary">Clear All</button>
             |
@@ -125,16 +125,16 @@
                 // iteratively growing final vector. All resolved intermediate vectors replace the last spotter->arty vector in the end.
                 // For the first TRP (as seen from arty) we need the vector, however subsequent lookups need the previuos intermediate_vector
                 // console.log("resolving "+trp_list.length+" TRPs");
-                for (var i=trp_list.length-1; i >= 0; i--) {
+                for (var i=0; i<trp_list.length; i++) {
                     // get this TRPs vector to the arty.
                     // (for the nearest TRP this is its stored azimut, all others in the chain need the resolved intermediate_vector value)
                     var trp_idx      = trp_list[i];
-                    var trp_art_dist = (i==trp_list.length-1)? parseFloat($("#input_trp_"+trp_idx+"_dist").val()) : art_dist;
-                    var trp_art_azim = (i==trp_list.length-1)? parseFloat($("#input_trp_"+trp_idx+"_azim").val()) : art_azim;
+                    var trp_art_dist = (i==0)? parseFloat($("#input_trp_"+trp_idx+"_dist").val()) : art_dist;
+                    var trp_art_azim = (i==0)? parseFloat($("#input_trp_"+trp_idx+"_azim").val()) : art_azim;
                     // console.log("resolve TRP #"+trp_idx+":  trp_art_azim="+trp_art_azim+"; trp_art_azim="+trp_art_azim);
                     
                     // get vector from this TRP to the next one (either another TRP or original spotter->arty)
-                    var next_src     = (i>0)?  "#input_trp_"+trp_list[i-1] : "#input_art";
+                    var next_src     = (i<trp_list.length-1)?  "#input_trp_"+trp_list[i+1] : "#input_art";
                     var next_dist    = parseFloat($(next_src+"_dist").val());
                     var next_azim_to = parseFloat($(next_src+"_azim").val());
                     var next_azim    = artycal.get_backcourse(next_azim_to); // the data points towards us, but we need it to point from us to them
@@ -220,9 +220,24 @@
             ************************/
             let trp_list = []; // list of trp indexes
             var update_trp_buttonstate = function() {
+                // update TRPs texts
+                for (var i=0; i<trp_list.length; i++) {
+                    var m = "-";
+                    if (i==trp_list.length-1) {
+                        m = "from spotter to TRP #"+trp_list[i];
+                    } else {
+                        m = "from TRP #"+trp_list[i+1]+" to TRP #"+trp_list[i];
+                    }
+                    $("#input_trp_"+trp_list[i]+"_dist").attr("placeholder", m);
+                    $("#input_trp_"+trp_list[i]+"_dist").attr("aria-label", m);
+                    $("#input_trp_"+trp_list[i]+"_azim").attr("placeholder", m);
+                    $("#input_trp_"+trp_list[i]+"_azim").attr("aria-label", m);
+                }
+            
+                // update arty text
                 var m = "from spotter to artillery";
                 if (trp_list.length > 0) {
-                    var lasTRPIdx = trp_list[trp_list.length-1];
+                    var lasTRPIdx = trp_list[0];
                     $("#btn_del_trp").show();
                     m = "from TRP #"+lasTRPIdx+" to artillery";
                 } else {
@@ -244,9 +259,8 @@
             
             $('#btn_add_trp').click(function() {
                 // Adds a new TRP to the selection
-                var prevTRPid     = trp_list[trp_list.length - 1];
-                var prevTRPid_txt = (prevTRPid)? "TRP #"+prevTRPid : "spotter";
-                var newTRPid      = trp_list.length + 1;
+                var prevTRPid     = trp_list[trp_list.length];
+                var newTRPid      = trp_list.length+1;
                 trp_list.push(newTRPid);
                 
                 // prepare simple HTML template
@@ -256,7 +270,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Distance</span>
                             </div>
-                            <input id="input_trp_{newTRPid}_dist" type="number" placeholder="from {prevTRPid_txt} to TRP #{newTRPid}" class="form-control" aria-label="from {prevTRPid_txt} to TRP #{newTRPid}" tabindex="{tabindex_dist}">
+                            <input id="input_trp_{newTRPid}_dist" type="number" placeholder="-" class="form-control" aria-label="-" tabindex="{tabindex_dist}">
                             <div class="input-group-append">
                                 <span class="input-group-text">meters</span>
                             </div>
@@ -265,7 +279,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Azimuth</span>
                             </div>
-                            <input id="input_trp_{newTRPid}_azim" type="number" placeholder="from {prevTRPid_txt} to TRP #{newTRPid}" class="form-control" aria-label="from {prevTRPid_txt} to TRP #{newTRPid}" tabindex="{tabindex_azim}">
+                            <input id="input_trp_{newTRPid}_azim" type="number" placeholder="-" class="form-control" aria-label="-" tabindex="{tabindex_azim}">
                             <div class="input-group-append">
                                 <span class="input-group-text">degrees</span>
                                 <button id="btn_swapcourse_trp_{newTRPid}_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
@@ -276,16 +290,17 @@
                 // replace variables in the template and
                 // finally add templated HTML container for the TRP
                 html_template = html_template.replace(/{prevTRPid}/g,     prevTRPid);
-                html_template = html_template.replace(/{prevTRPid_txt}/g, prevTRPid_txt);
                 html_template = html_template.replace(/{newTRPid}/g,      newTRPid);
-                html_template = html_template.replace(/{tabindex_dist}/g, newTRPid+10);
-                html_template = html_template.replace(/{tabindex_azim}/g, newTRPid+11);
-                $("#container_additional_trps").append(html_template);
+                html_template = html_template.replace(/{tabindex_dist}/g,  99-newTRPid);
+                html_template = html_template.replace(/{tabindex_azim}/g, 100-newTRPid);
+                $("#container_additional_trps").prepend(html_template);
                 
                 $("#btn_swapcourse_trp_"+newTRPid+"_azim").click(function() {
                     var backcourse = artycal.get_backcourse( parseFloat($("#input_trp_"+newTRPid+"_azim").val()) );
                     $("#input_trp_"+newTRPid+"_azim").val( backcourse );
                 });
+                
+                $("#input_trp_"+newTRPid+"_dist").focus();
                 
                 update_trp_buttonstate();
             });
