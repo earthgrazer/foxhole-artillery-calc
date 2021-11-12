@@ -249,6 +249,14 @@
                 $(this).select();
             });
             
+            /* Iput fields try to calculate when hitting ENTER */
+            $("#input_tar_dist").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_tar_azim").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_dist").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_azim").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_corr_dir").keyup(function(e){   if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_corr_dist").keyup(function(e){  if(e.which == 13)  $("#btn_compute").click();  });
+            
             
             
             /***********************
@@ -335,6 +343,8 @@
                     var backcourse = artycal.get_backcourse( parseFloat($("#input_trp_"+newTRPid+"_azim").val()) );
                     $("#input_trp_"+newTRPid+"_azim").val( backcourse );
                 });
+                $("#input_trp_"+newTRPid+"_dist").keyup(function(e){  if(e.which == 13)  $("#btn_compute").click();  });
+                $("#input_trp_"+newTRPid+"_azim").keyup(function(e){  if(e.which == 13)  $("#btn_compute").click();  });
                 
                 $("#input_trp_"+newTRPid+"_dist").focus();
                 
