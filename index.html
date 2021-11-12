@@ -50,18 +50,28 @@
                     <span class="input-group-text">meters</span>
                 </div>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-0">
                 <div class="input-group-prepend">
                     <span class="input-group-text" style="width:5.5em">Azimuth</span>
                 </div>
                 <input id="input_art_azim" type="number" class="form-control" tabindex="101">
-                <input id="input_art_corr" type="number" class="form-control" tabindex="102" placeholder="Correction in m (negative=left, optional)" aria-label="Correction in m (negative=left, optional)">
                 <div class="input-group-append">
                     <span class="input-group-text">degrees</span>
                     <button id="btn_swapcourse_art_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
                 </div>
             </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="width:5.5em">Correction</span>
+                </div>
+                <input id="input_art_corr_dir" type="number" class="form-control" tabindex="102" placeholder="X Correction left/right in m (negative=left, optional)" aria-label="Correction in m (negative=left, optional)">
+                <input id="input_art_corr_dist" type="number" class="form-control" tabindex="103" placeholder="Y Correction short/add in m (negative=short, optional)" aria-label="Correction in m (negative=left, optional)">
+                <div class="input-group-append">
+                    <span class="input-group-text">meters (viewed from spotter)</span>
+                </div>
+            </div>
         </section>
+
         <section>
             <button id="btn_compute" type="button" class="btn btn-outline-primary" tabindex="110">Compute</button>
             <button id="btn_clear_tar" type="button" class="btn btn-outline-secondary">Clear Target</button>
@@ -90,14 +100,14 @@
                 <li>Have a spotter determine the distance and azimuth to the target location.</li>
                 <li>Without moving, have the spotter determine the distance and azimuth to the artillery location.</li>
                 <li>Input the two sets of values, and the computed result is the distance and azimuth from the artillery to the target.</li>
-                <li>The optional left/right correction can be entered as viewed from the gun in meters. Negative values indicate correction to the left.</li>
+                <li>The optional left/right and drop/add correction can be entered as viewed from the spotter in meters. Negative values indicate correction to the left/closer to the spotter.</li>
                 <li>Adjust the artillery settings to match the resulting values, then fire!</li>
                 <li>You can optionally insert linked Target Reference Points between the spotter and the arty, this allows for spotting beyond binocular range.</li>
             </ol>
             <p>The <strong>In-game values</strong> in the result are rounded to match the in-game increments.</p>
-            <p>You can save firing plans for later use. To do this, add a new plan from the menu and enter a name. The current state will be persisted
+            <p>You can save <b>firing plans</b> for later use. To do this, add a new plan from the menu and enter a name. The current state will be persisted
             and can be reloaded by selecting it form the firing plan menu. The currently active plan is displayed and by pressing the button,
-            you can reset the current values to the stored ones.</p>
+            you can reset the current values to the stored ones. Note that the correction portion is <i>not</i> restored.</p>
             <p>Please report bugs and suggestions <a href="https://github.com/earthgrazer/foxhole-artillery-calc/issues" target="_blank">here</a>.</p>
         </section>
         <section id="sec_result">
@@ -160,7 +170,25 @@
                     
                 }
 
-                // Calculate vector from arty->spotters target.
+                // Optionally apply correction.
+                // We do this by calculating a "hidden TRP" which reflects the correction as viewed from the forward observer.
+                var corr_x = parseFloat($("#input_art_corr_dir").val());  if (isNaN(corr_x)) corr_x=0;
+                var corr_y = parseFloat($("#input_art_corr_dist").val()); if (isNaN(corr_y)) corr_y=0;
+                var corr_vector = artycal.cartesianToPolar(0, 0, corr_x, corr_y);
+
+                // the correction vector is relative to the spotters front (0°=straight in front); so we need to convert to "true north"
+                corr_vector.azim = tar_azim + corr_vector.azim;
+                if (corr_vector.azim > 360) corr_vector.azim = corr_vector.azim - 360;
+                if (corr_vector.azim <   0) corr_vector.azim = corr_vector.azim + 360;
+
+                // apply correction to final result
+                //console.log("correction vector: (%o) %o", {x:corr_x, y:corr_y}, corr_vector);
+                var intermediate_vector = artycal.calc_artillery(corr_vector.dist, corr_vector.azim, art_dist, art_azim);
+                art_dist = intermediate_vector.art_tar_dist;
+                art_azim = artycal.get_backcourse(intermediate_vector.art_tar_deg);
+
+
+                // Calculate corrected vector from arty->spotters target.
                 // Either that is directly that from the spotter, or the resolved intermediate_vector from the TRP chain
                 var result = artycal.calc_artillery(tar_dist, tar_azim, art_dist, art_azim);
 
@@ -169,18 +197,11 @@
                     $("#est_result_div").html("");
                 }
                 else {
-                    // apply optional correction
-                    var corr        = parseFloat($("#input_art_corr").val());
-                    var corr_1deg   = artycal.getOpAngleDist(result.art_tar_dist, 1.0);
-                    var corr_mToDeg = 0;
-                    if (!isNaN(corr)) {
-                        console.log("apply correction: %o", corr);
-                        corr_mToDeg = artycal.getCorrectionAngle(result.art_tar_dist, corr);
-                        result.art_tar_deg = result.art_tar_deg + corr_mToDeg;
-                    }
-                    
                     // print results
-                    $("#raw_result_div").html("Raw values: [Distance: " + (Math.round(result.art_tar_dist*100)/100) + ", Azimuth: " + (Math.round((result.art_tar_deg-corr_mToDeg)*100)/100) + ", correction ("+Math.round(artycal.getOpAngleDist(result.art_tar_dist, 1.0)*100)/100+"m/1&deg;): "+((corr_mToDeg>0)?"+":"")+Math.round(corr_mToDeg*100)/100+"&deg;]");
+                    var correction_str = (corr_x != 0 || corr_y != 0)? " =&gt; "+(Math.round(corr_vector.dist*100)/100)+"m/"+(Math.round(corr_vector.azim*100)/100)+"&deg;" : "";
+                    $("#raw_result_div").html("Raw values: [Distance: " + (Math.round(result.art_tar_dist*100)/100) + ", Azimuth: " + (Math.round((result.art_tar_deg)*100)/100)
+                        + " (correction: "+Math.round(artycal.getOpAngleDist(result.art_tar_dist, 1.0)*100)/100+"m/1&deg;"+correction_str+")"
+                        + "]");
                     var roundedResultAzim = Math.round(result.art_tar_deg);
                     if (roundedResultAzim == 360) roundedResultAzim = 0;
                     $("#est_result_div").html("<strong>In-game [Distance: " + artycal.roundTo5(result.art_tar_dist) + "m, Azimuth: " + roundedResultAzim + "]</strong>");
@@ -204,7 +225,8 @@
                 $("#input_tar_azim").val("");
                 $("#input_art_dist").val("");
                 $("#input_art_azim").val("");
-                $("#input_art_corr").val("");
+                $("#input_art_corr_dir").val("");
+                $("#input_art_corr_dist").val("");
                 for (var i=trp_list.length; i>0; i--) {
                     dropLastTRP();
                 };
@@ -356,7 +378,10 @@
                     art:{
                         dist:parseFloat($("#input_art_dist").val()),
                         azim:parseFloat($("#input_art_azim").val()),
-                        corr:parseFloat($("#input_art_corr").val())
+                        corr:{
+                            dir:parseFloat($("#input_art_corr_dir").val()),
+                            dist:parseFloat($("#input_art_corr_dist").val())
+                        }
                     },
                     trps:[]
                 };
@@ -394,7 +419,10 @@
                 // restore spotter||trp -> arty leg
                 $("#input_art_dist").val(fp.art.dist);
                 $("#input_art_azim").val(fp.art.azim);
-                $("#input_art_corr").val(fp.art.corr);
+                
+                // Do not restore correction: its depending on wind
+                //$("#input_art_corr_dir").val(fp.art.corr.dir);
+                //$("#input_art_corr_dist").val(fp.art.corr.dist);
                 
                 // when loading a firingplan, set it active
                 $("#firingplans_menu_btn").html(firingplans[id].name);

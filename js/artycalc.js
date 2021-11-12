@@ -62,6 +62,41 @@ var artycal = (function() {
             return ceil;
         }
     };
+    
+    /**
+     * Compute polar vector
+     * 
+     * @returns {dist:dist, azim:azim}
+     */
+    inst.cartesianToPolar = function(xa, ya, xb, yb) {
+        // calculate distance from artillery to target
+        var dist = Math.sqrt(Math.pow(xa - xb, 2) + Math.pow(ya - yb, 2));
+        // calculate azimuth from artiller to target
+        var azim = 0;
+        if (dist > 0) {
+            azim = to_degrees(Math.asin(Math.abs(xb) / dist));
+        }
+
+        // adjust degrees based on what quadrant the target is located relative to the artillery
+        if (xb < 0 && yb >= 0) {
+            // Target is in second quadrant
+            azim = 360 - azim;
+        }
+        else if (xb < 0 && yb < 0) {
+            // Target is in third quadrant
+            azim = 180 + azim;
+        }
+        else if (xb >= 0 && yb < 0) {
+            // Target is in fourth quadrant
+            azim = 180 - azim;
+        }
+
+        if (isNaN(dist) || isNaN(azim)) {
+            return {error: true};
+        }
+
+        return {dist:dist, azim:azim};
+    }
 
     /**
      * Compute distance and azimuth from artillery to target given location information relative to a spotter.
@@ -84,34 +119,10 @@ var artycal = (function() {
         var translate_origin = get_translate_matrix(art_coord);
         apply_translate(tar_coord, translate_origin);
         apply_translate(art_coord, translate_origin);
-
-        // calculate distance from artillery to target
-        var art_tar_dist = Math.sqrt(Math.pow(art_coord.x - tar_coord.x, 2) + Math.pow(art_coord.y - tar_coord.y, 2));
-        // calculate azimuth from artiller to target
-        var art_tar_deg = 0;
-        if (art_tar_dist > 0) {
-            art_tar_deg = to_degrees(Math.asin(Math.abs(tar_coord.x) / art_tar_dist));
-        }
-
-        // adjust degrees based on what quadrant the target is located relative to the artillery
-        if (tar_coord.x < 0 && tar_coord.y >= 0) {
-            // Target is in second quadrant
-            art_tar_deg = 360 - art_tar_deg;
-        }
-        else if (tar_coord.x < 0 && tar_coord.y < 0) {
-            // Target is in third quadrant
-            art_tar_deg = 180 + art_tar_deg;
-        }
-        else if (tar_coord.x >= 0 && tar_coord.y < 0) {
-            // Target is in fourth quadrant
-            art_tar_deg = 180 - art_tar_deg;
-        }
-
-        if (isNaN(art_tar_dist) || isNaN(art_tar_deg)) {
-            return {error: true};
-        }
-
-        return {art_tar_dist: art_tar_dist, art_tar_deg: art_tar_deg};
+        
+        // calculate distance and azimuth from the arty to its target
+        var result = inst.cartesianToPolar(art_coord.x, art_coord.y, tar_coord.x, tar_coord.y);
+        return {art_tar_dist: result.dist, art_tar_deg: result.azim};
     };
 
     return inst;
