@@ -9,86 +9,187 @@
 <body>
     <div class="container">
         <section>
-            <h2>Target</h2>
-            <div class="input-group mb-3">
+            <h2 style="font-size:20pt">Target</h2>
+            <div class="input-group mb-0">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Distance</span>
+                    <span class="input-group-text" style="width:5.5em">Distance</span>
                 </div>
-                <input id="input_tar_dist" type="number" placeholder="from spotter to target" class="form-control" aria-label="from spotter to target" tabindex="1" autofocus>
+                <input id="input_tar_dist" type="number" class="form-control" tabindex="1" autofocus placeholder="from spotter to target" aria-label="from spotter to target">
                 <div class="input-group-append">
                     <span class="input-group-text">meters</span>
                 </div>
             </div>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Azimuth</span>
+                    <span class="input-group-text" style="width:5.5em">Azimuth</span>
                 </div>
-                <input id="input_tar_azim" type="number" placeholder="from spotter to target" class="form-control" aria-label="from spotter to target" tabindex="2">
+                <input id="input_tar_azim" type="number" class="form-control" tabindex="2" placeholder="from spotter to target" aria-label="from spotter to target">
                 <div class="input-group-append">
                     <span class="input-group-text">degrees</span>
+                    <button id="btn_swapcourse_tar_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
                 </div>
             </div>
         </section>
+
         <section>
-            <h2>Artillery</h2>
-            <div class="input-group mb-3">
+            <hr/>
+            <button id="btn_add_trp" class="btn btn-secondary btn-sm">+ Add Target Reference Point</button>
+            <button id="btn_del_trp" class="btn btn-outline-danger btn-sm">- remove Target Reference Point</button>
+            <div id="container_additional_trps"><!-- Info: New TRPs stack up here --></div>
+            <hr/>
+        </section>
+
+        <section>
+            <h2 style="font-size:20pt">Artillery</h2>
+            <div class="input-group mb-0">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Distance</span>
+                    <span class="input-group-text" style="width:5.5em">Distance</span>
                 </div>
-                <input id="input_art_dist" type="number" placeholder="from spotter to artillery" class="form-control" aria-label="from spotter to artillery" tabindex="3">
+                <input id="input_art_dist" type="number" class="form-control" tabindex="100">
                 <div class="input-group-append">
                     <span class="input-group-text">meters</span>
                 </div>
             </div>
-            <div class="input-group mb-3">
+            <div class="input-group mb-0">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">Azimuth</span>
+                    <span class="input-group-text" style="width:5.5em">Azimuth</span>
                 </div>
-                <input id="input_art_azim" type="number" placeholder="from spotter to artillery" class="form-control" aria-label="from spotter to artillery" tabindex="4">
+                <input id="input_art_azim" type="number" class="form-control" tabindex="101">
                 <div class="input-group-append">
                     <span class="input-group-text">degrees</span>
+                    <button id="btn_swapcourse_art_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" style="width:5.5em">Correction</span>
+                </div>
+                <input id="input_art_corr_dir" type="number" class="form-control" tabindex="102" placeholder="left/right in m (negative=left, optional)" aria-label="left/right Correction in m (negative=left, optional)">
+                <input id="input_art_corr_dist" type="number" class="form-control" tabindex="103" placeholder="short/add in m (negative=short, optional)" aria-label="short/add Correction in m (negative=short, optional)">
+                <div class="input-group-append">
+                    <span class="input-group-text">meters (viewed from spotter)</span>
                 </div>
             </div>
         </section>
+
         <section>
-            <button id="btn_compute" type="button" class="btn btn-outline-primary" tabindex="5">Compute</button>
+            <button id="btn_compute" type="button" class="btn btn-outline-primary" tabindex="110">Compute</button>
             <button id="btn_clear_tar" type="button" class="btn btn-outline-secondary">Clear Target</button>
             <button id="btn_clear" type="button" class="btn btn-outline-secondary">Clear All</button>
+            |
+            <div class="btn-group dropup" id="firingplans_dropdown">
+                <button type="button" class="btn btn-outline-dark" id="firingplans_menu_btn">Firing plans</button>
+                <button type="button" class="btn btn-outline-dark dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu" id="firingplans_menu">
+                    <button class="dropdown-item" type="button" id="firingplans_menu_add">Add new plan</button>
+                    <button class="dropdown-item" type="button" id="firingplans_menu_save">Save current plan</button>
+                    <button class="dropdown-item" type="button" id="firingplans_menu_del">Delete current plan</button>
+                    <div class="dropdown-divider"></div>
+                </div>
+                <input id="firingplans_add_input" type="text" class="form-control" placeholder="input name, confirm [enter]" aria-label="input name, confirm [enter]">
+            </div>
+            |
             <button id="btn_info" type="button" class="btn btn-outline-info">Info</button>
         </section>
         <section id="sec_info">
-            <h2>Information</h2>
+            <h2 style="font-size:20pt">Information</h2>
             <p>To use this calculator:</p>
             <ol>
                 <li>Have a spotter determine the distance and azimuth to the target location.</li>
                 <li>Without moving, have the spotter determine the distance and azimuth to the artillery location.</li>
                 <li>Input the two sets of values, and the computed result is the distance and azimuth from the artillery to the target.</li>
+                <li>The optional left/right and drop/add correction can be entered as viewed from the spotter in meters. Negative values indicate correction to the left/closer to the spotter.</li>
                 <li>Adjust the artillery settings to match the resulting values, then fire!</li>
+                <li>You can optionally insert linked Target Reference Points between the spotter and the arty, this allows for spotting beyond binocular range.</li>
             </ol>
             <p>The <strong>In-game values</strong> in the result are rounded to match the in-game increments.</p>
+            <p>You can save <b>firing plans</b> for later use. To do this, add a new plan from the menu and enter a name. The current state will be persisted
+            and can be reloaded by selecting it form the firing plan menu. The currently active plan is displayed and by pressing the button,
+            you can reset the current values to the stored ones. Note that the correction portion is <i>not</i> restored.</p>
             <p>Please report bugs and suggestions <a href="https://github.com/earthgrazer/foxhole-artillery-calc/issues" target="_blank">here</a>.</p>
         </section>
         <section id="sec_result">
-            <h2>Result</h2>
-            <div id="raw_result_div"></div>
+            <h2 style="font-size:20pt">Result</h2>
             <div id="est_result_div"></div>
+            <div id="raw_result_div" style="font-size:small"></div>
         </section>
     </div>
-    <script
-            src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha256-k2WSCIexGzOj3Euiig+TlR8gA0EmPjuc79OEeY5L45g="
-            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
     <script type="text/javascript" src="./js/artycalc.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $("#sec_result").hide();
 
             $("#btn_compute").click(function() {
+                // final leg spotter->tgt
                 var tar_dist = parseFloat($("#input_tar_dist").val());
                 var tar_azim = parseFloat($("#input_tar_azim").val());
+                
+                // leg spotter -> arty||trp1
                 var art_dist = parseFloat($("#input_art_dist").val());
                 var art_azim = parseFloat($("#input_art_azim").val());
+                
+                // Resolve optional TRPs in between and thus create a new big leg spotter->arty.
+                // We walk the TRPs from the arty to the target and resolve each new TRP into a
+                // iteratively growing final vector. All resolved intermediate vectors replace the last spotter->arty vector in the end.
+                // For the first TRP (as seen from arty) we need the vector, however subsequent lookups need the previuos intermediate_vector
+                // console.log("resolving "+trp_list.length+" TRPs");
+                for (var i=0; i<trp_list.length; i++) {
+                    // get this TRPs vector to the arty.
+                    // (for the nearest TRP this is its stored azimut, all others in the chain need the resolved intermediate_vector value)
+                    var trp_idx      = trp_list[i];
+                    var trp_art_dist = (i==0)? parseFloat($("#input_trp_"+trp_idx+"_dist").val()) : art_dist;
+                    var trp_art_azim = (i==0)? parseFloat($("#input_trp_"+trp_idx+"_azim").val()) : art_azim;
+                    // console.log("resolve TRP #"+trp_idx+":  trp_art_azim="+trp_art_azim+"; trp_art_azim="+trp_art_azim);
+                    
+                    // get vector from this TRP to the next one (either another TRP or original spotter->arty)
+                    var next_src     = (i<trp_list.length-1)?  "#input_trp_"+trp_list[i+1] : "#input_art";
+                    var next_dist    = parseFloat($(next_src+"_dist").val());
+                    var next_azim_to = parseFloat($(next_src+"_azim").val());
+                    var next_azim    = artycal.get_backcourse(next_azim_to); // the data points towards us, but we need it to point from us to them
+                    // console.log("resolve TRP #"+trp_idx+":  next_dist="+next_dist+"; next_azim="+next_azim+" (backcourse from "+next_src+"_azim="+next_azim_to+")");
+                    
+                    // calculate dist+azim from arty to the next point
+                    var intermediate_vector = artycal.calc_artillery(next_dist, next_azim, trp_art_dist, trp_art_azim);
+                    if (intermediate_vector.hasOwnProperty("error")) {
+                        $("#raw_result_div").html("Error in TRP #"+trp_idx+" input value(s)");
+                        $("#est_result_div").html("");
+                        $("#sec_result").show();
+                        return;
+                    } else {
+                        // we now know the vector from the arty to the next spot.
+                        // the backcourse of that is what we need for the next (or final) resolving iteration.
+                        art_dist = intermediate_vector.art_tar_dist;
+                        art_azim = artycal.get_backcourse(intermediate_vector.art_tar_deg);
+                        // console.log("resolve TRP #"+trp_idx+":  new_art_dist="+art_dist+"; new_art_azim="+art_azim+" (intermediate_vector.art_tar_deg="+intermediate_vector.art_tar_deg+")");
+                    }
+                    
+                    
+                }
 
+                // Optionally apply correction.
+                // We do this by calculating a "hidden TRP" which reflects the correction as viewed from the forward observer.
+                var corr_x = parseFloat($("#input_art_corr_dir").val());  if (isNaN(corr_x)) corr_x=0;
+                var corr_y = parseFloat($("#input_art_corr_dist").val()); if (isNaN(corr_y)) corr_y=0;
+                var corr_vector = artycal.cartesianToPolar(0, 0, corr_x, corr_y);
+
+                // the correction vector is relative to the spotters front (0°=straight in front); so we need to convert to "true north"
+                corr_vector.azim = tar_azim + corr_vector.azim;
+                if (corr_vector.azim > 360) corr_vector.azim = corr_vector.azim - 360;
+                if (corr_vector.azim <   0) corr_vector.azim = corr_vector.azim + 360;
+
+                // apply correction to final result
+                //console.log("correction vector: (%o) %o", {x:corr_x, y:corr_y}, corr_vector);
+                var intermediate_vector = artycal.calc_artillery(corr_vector.dist, corr_vector.azim, art_dist, art_azim);
+                art_dist = intermediate_vector.art_tar_dist;
+                art_azim = artycal.get_backcourse(intermediate_vector.art_tar_deg);
+
+
+                // Calculate corrected vector from arty->spotters target.
+                // Either that is directly that from the spotter, or the resolved intermediate_vector from the TRP chain
                 var result = artycal.calc_artillery(tar_dist, tar_azim, art_dist, art_azim);
 
                 if (result.hasOwnProperty("error")) {
@@ -96,12 +197,27 @@
                     $("#est_result_div").html("");
                 }
                 else {
-                    $("#raw_result_div").html("Raw values: [Distance: " + result.art_tar_dist + ", Azimuth: " + result.art_tar_deg + "]");
-                    $("#est_result_div").html("<strong>In-game values: [Distance: " + artycal.roundTo5(result.art_tar_dist) + "m, Azimuth: " + Math.round(result.art_tar_deg) + "]</strong>");
+                    // print results
+                    var correction_str = (corr_x != 0 || corr_y != 0)? " =&gt; "+(Math.round(corr_vector.dist*100)/100)+"m/"+(Math.round(corr_vector.azim*100)/100)+"&deg;" : "";
+                    $("#raw_result_div").html("Raw values: [Distance: " + (Math.round(result.art_tar_dist*100)/100) + ", Azimuth: " + (Math.round((result.art_tar_deg)*100)/100)
+                        + " (correction: "+Math.round(artycal.getOpAngleDist(result.art_tar_dist, 1.0)*100)/100+"m/1&deg;"+correction_str+")"
+                        + "]");
+                    var roundedResultAzim = Math.round(result.art_tar_deg);
+                    if (roundedResultAzim == 360) roundedResultAzim = 0;
+                    $("#est_result_div").html("<strong>In-game [Distance: " + artycal.roundTo5(result.art_tar_dist) + "m, Azimuth: " + roundedResultAzim + "]</strong>");
                 }
 
                 $("#sec_result").show();
                 $("#sec_info").hide();
+            });
+            
+            $('#btn_swapcourse_tar_azim').click(function() {
+                var backcourse = artycal.get_backcourse( parseFloat($("#input_tar_azim").val()) );
+                $("#input_tar_azim").val( backcourse );
+            });
+            $('#btn_swapcourse_art_azim').click(function() {
+                var backcourse = artycal.get_backcourse( parseFloat($("#input_art_azim").val()) );
+                $("#input_art_azim").val( backcourse );
             });
 
             $("#btn_clear").click(function() {
@@ -109,6 +225,14 @@
                 $("#input_tar_azim").val("");
                 $("#input_art_dist").val("");
                 $("#input_art_azim").val("");
+                $("#input_art_corr_dir").val("");
+                $("#input_art_corr_dist").val("");
+                for (var i=trp_list.length; i>0; i--) {
+                    dropLastTRP();
+                };
+                active_plan_id = -1;
+                $("#firingplans_menu_btn").html("Firing plans");
+                updateFireplanSubmenuState();
             });
 
             $("#btn_clear_tar").click(function() {
@@ -124,6 +248,322 @@
             $("input").focus(function() {
                 $(this).select();
             });
+            
+            /* Iput fields try to calculate when hitting ENTER */
+            $("#input_tar_dist").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_tar_azim").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_dist").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_azim").keyup(function(e){       if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_corr_dir").keyup(function(e){   if(e.which == 13)  $("#btn_compute").click();  });
+            $("#input_art_corr_dist").keyup(function(e){  if(e.which == 13)  $("#btn_compute").click();  });
+            
+            
+            
+            /***********************
+            * TRP functionality    *
+            ************************/
+            let trp_list = []; // list of trp indexes
+            var update_trp_buttonstate = function() {
+                // update TRPs texts
+                for (var i=0; i<trp_list.length; i++) {
+                    var m = "-";
+                    if (i==trp_list.length-1) {
+                        m = "from spotter to TRP #"+trp_list[i];
+                    } else {
+                        m = "from TRP #"+trp_list[i+1]+" to TRP #"+trp_list[i];
+                    }
+                    $("#input_trp_"+trp_list[i]+"_dist").attr("placeholder", m);
+                    $("#input_trp_"+trp_list[i]+"_dist").attr("aria-label", m);
+                    $("#input_trp_"+trp_list[i]+"_azim").attr("placeholder", m);
+                    $("#input_trp_"+trp_list[i]+"_azim").attr("aria-label", m);
+                }
+            
+                // update arty text
+                var m = "from spotter to artillery";
+                if (trp_list.length > 0) {
+                    var lasTRPIdx = trp_list[0];
+                    $("#btn_del_trp").show();
+                    m = "from TRP #"+lasTRPIdx+" to artillery";
+                } else {
+                    $("#btn_del_trp").hide();
+                    var m = "from spotter to artillery";
+                }
+                $("#input_art_dist").attr("placeholder", m);
+                $("#input_art_dist").attr("aria-label", m);
+                $("#input_art_azim").attr("placeholder", m);
+                $("#input_art_azim").attr("aria-label", m);
+            };
+            update_trp_buttonstate();
+            
+            var dropLastTRP = function() {
+                var lastID =  trp_list.pop();
+                $("#trp_"+lastID).remove();
+                update_trp_buttonstate();
+            }
+            
+            $('#btn_add_trp').click(function() {
+                // Adds a new TRP to the selection
+                var prevTRPid     = trp_list[trp_list.length];
+                var newTRPid      = trp_list.length+1;
+                trp_list.push(newTRPid);
+                
+                // prepare simple HTML template
+                var html_template = `<section id="trp_{newTRPid}">
+                        <h2 style="font-size:20pt">Target Reference Point (TRP) #{newTRPid}</h2>
+                        <div class="input-group mb-0">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width:5.5em">Distance</span>
+                            </div>
+                            <input id="input_trp_{newTRPid}_dist" type="number" placeholder="-" class="form-control" aria-label="-" tabindex="{tabindex_dist}">
+                            <div class="input-group-append">
+                                <span class="input-group-text">meters</span>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" style="width:5.5em">Azimuth</span>
+                            </div>
+                            <input id="input_trp_{newTRPid}_azim" type="number" placeholder="-" class="form-control" aria-label="-" tabindex="{tabindex_azim}">
+                            <div class="input-group-append">
+                                <span class="input-group-text">degrees</span>
+                                <button id="btn_swapcourse_trp_{newTRPid}_azim" class="btn btn-outline-secondary" title="swap backcourse">&#x21c4;</button>
+                            </div>
+                        </div>
+                    </section>
+                `;
+                // replace variables in the template and
+                // finally add templated HTML container for the TRP
+                html_template = html_template.replace(/{prevTRPid}/g,     prevTRPid);
+                html_template = html_template.replace(/{newTRPid}/g,      newTRPid);
+                html_template = html_template.replace(/{tabindex_dist}/g,  99-newTRPid);
+                html_template = html_template.replace(/{tabindex_azim}/g, 100-newTRPid);
+                $("#container_additional_trps").prepend(html_template);
+                
+                $("#btn_swapcourse_trp_"+newTRPid+"_azim").click(function() {
+                    var backcourse = artycal.get_backcourse( parseFloat($("#input_trp_"+newTRPid+"_azim").val()) );
+                    $("#input_trp_"+newTRPid+"_azim").val( backcourse );
+                });
+                $("#input_trp_"+newTRPid+"_dist").keyup(function(e){  if(e.which == 13)  $("#btn_compute").click();  });
+                $("#input_trp_"+newTRPid+"_azim").keyup(function(e){  if(e.which == 13)  $("#btn_compute").click();  });
+                
+                $("#input_trp_"+newTRPid+"_dist").focus();
+                
+                update_trp_buttonstate();
+            });
+            
+            
+            $("#btn_del_trp").click(function() {
+                dropLastTRP();
+            });
+            
+            
+            
+            /****************************
+            * Load/save/del firing plan *
+            ****************************/
+            
+            // init stored plans
+            const firingplans_storagename = "foxhole-artillery-calc_firingplans";
+            var firingplans = JSON.parse(localStorage.getItem(firingplans_storagename));
+            if (firingplans == null) firingplans = [];
+            $("#firingplans_add_input").hide();
+            var active_plan_id = -1;
+            
+            // Function stores cleaned version of the data array
+            var persist_firingplans = function() {
+                var firingplans_clean = firingplans.filter(data => data != null);
+                localStorage.setItem(firingplans_storagename, JSON.stringify(firingplans_clean));
+                //console.log("persisted: %o", firingplans_clean);
+            };
+            
+            // Function makes new fireplan structure based on current input state
+            var newFireplanFromcurrent = function(name) {
+                var fp_struct =
+                {
+                    name:name,
+                    tgt:{
+                        dist:parseFloat($("#input_tar_dist").val()),
+                        azim:parseFloat($("#input_tar_azim").val())
+                    },
+                    art:{
+                        dist:parseFloat($("#input_art_dist").val()),
+                        azim:parseFloat($("#input_art_azim").val()),
+                        corr:{
+                            dir:parseFloat($("#input_art_corr_dir").val()),
+                            dist:parseFloat($("#input_art_corr_dist").val())
+                        }
+                    },
+                    trps:[]
+                };
+                
+                // add optional TRPs
+                for (var i=0; i<trp_list.length; i++) {
+                    var trp_idx = trp_list[i];
+                    fp_struct.trps.push({
+                        id:trp_idx,
+                        dist:parseFloat($("#input_trp_"+trp_idx+"_dist").val()),
+                        azim:parseFloat($("#input_trp_"+trp_idx+"_azim").val())
+                    });
+                }
+                
+                return fp_struct;
+            };
+            
+            // loads a given firingplan to the input fields
+            var loadFiringplan = function(id) {
+                var fp = firingplans[id];
+                //console.log("load fireplan: %i=%o", id, fp);
+                $("#btn_clear").click();  // clean out everything set so far
+                
+                // restore spotter->tgt leg
+                $("#input_tar_dist").val(fp.tgt.dist);
+                $("#input_tar_azim").val(fp.tgt.azim);
+                
+                // restore optional TRPs
+                for (var trp_idx=0; trp_idx<fp.trps.length; trp_idx++) {
+                    $('#btn_add_trp').click();
+                    $("#input_trp_"+ (trp_idx+1) +"_dist").val(fp.trps[trp_idx].dist);
+                    $("#input_trp_"+ (trp_idx+1) +"_azim").val(fp.trps[trp_idx].azim);
+                }
+                
+                // restore spotter||trp -> arty leg
+                $("#input_art_dist").val(fp.art.dist);
+                $("#input_art_azim").val(fp.art.azim);
+                
+                // Do not restore correction: its depending on wind
+                //$("#input_art_corr_dir").val(fp.art.corr.dir);
+                //$("#input_art_corr_dist").val(fp.art.corr.dist);
+                
+                // when loading a firingplan, set it active
+                $("#firingplans_menu_btn").html(firingplans[id].name);
+                active_plan_id = id;
+                
+                // when loading a firingplan, clear previous results
+                $("#raw_result_div").html("");
+                $("#est_result_div").html("");
+                
+                updateFireplanSubmenuState();
+            };
+            
+            // Add a fireplan to the list and storage
+            // If newPlanID is not null, the storage is not adjusted and the given Id used as reference
+            // returns ID of the added plan
+            var globalUnique_newPlanID = firingplans.length;
+            var addFiringplan = function(fp, newPlanID=null) {
+                if (newPlanID == null) {
+                    newPlanID              = globalUnique_newPlanID++;
+                    firingplans[newPlanID] = fp;
+                    active_plan_id         = newPlanID;
+                    persist_firingplans();
+                    $("#firingplans_menu_btn").html(firingplans[newPlanID].name);
+                }
+                
+                $("#firingplans_menu").append("<button class=\"dropdown-item\" type=\"button\" id=\"firingplans_plan_"+newPlanID+"\">"+firingplans[newPlanID].name+"</button>");
+                $("#firingplans_plan_"+newPlanID).click(function(e){
+                    //console.log("Fireplan item clicked, active plan="+active_plan_id+"; newPlanID="+newPlanID+"; this_id=%o", $(this));
+                    loadFiringplan(newPlanID);
+                });
+                
+                return newPlanID;
+            }
+            
+            // Updates the menus accessibility
+            var updateFireplanSubmenuState = function() {
+                // visible per default
+                $("#firingplans_menu_add").removeAttr("disabled");
+                $("#firingplans_menu_del").removeAttr("disabled");
+                $("#firingplans_menu_save").removeAttr("disabled");
+                $(":button[id*=firingplans_plan_]").removeAttr("disabled");
+            
+                // no active plan selected: disable del and save buttons
+                // (note: also the case when no plan is stored at all)
+                var firingplans_clean = firingplans.filter(data => data != null);
+                //console.log("DBG: active = "+active_plan_id+"; l="+firingplans_clean.length);
+                if (active_plan_id < 0 || firingplans_clean.length == 0 ) {
+                    $("#firingplans_menu_del").attr("disabled","");
+                    $("#firingplans_menu_save").attr("disabled","");
+                }
+
+                // menu not accessible when input element is active
+                if ($("#firingplans_add_input").is(":visible")) {
+                    $("#firingplans_menu_add").attr("disabled","");
+                    $("#firingplans_menu_del").attr("disabled","");
+                    $("#firingplans_menu_save").attr("disabled","");
+                    $(":button[id*=firingplans_plan_]").attr("disabled","");
+                }
+                
+                // No save and del option when no firingplan is active
+                var firingplans_clean = firingplans.filter(data => data != null);
+                if (active_plan_id < 0) {
+                    $("#firingplans_menu_del").attr("disabled","");
+                    $("#firingplans_menu_save").attr("disabled","");
+                }
+            };
+            
+            
+            // Initialize dropdown values from stored content
+            //console.log("loading "+firingplans.length+" fireplans");
+            for (var i=0;i<firingplans.length; i++) {
+                addFiringplan(firingplans[i], i);
+                //console.log("  Fireplan "+i+": %o", firingplans[i]);
+            }
+            updateFireplanSubmenuState();
+            
+            // DropDown actions
+            $("#firingplans_menu_add").click(function() {
+                // add button shows the input field
+                $("#firingplans_add_input").show();
+                $("#firingplans_add_input").focus();
+                updateFireplanSubmenuState();
+            });
+            $("#firingplans_add_input").keyup(function(e){
+                // the input field reacts on enter and will store the new plan
+                if(e.which == 13){  //onEnter
+                    var fpname = $(this).val();
+                    if (fpname != null && fpname != "") {
+                        freshFireplan  = newFireplanFromcurrent(fpname);
+                        active_plan_id = addFiringplan(freshFireplan);
+                        loadFiringplan(active_plan_id);
+                        persist_firingplans();
+                    } else {
+                        //console.log("adding firingplan skipped: name empty");
+                    }
+                    
+                    // clean input field and hide it again
+                    $("#firingplans_add_input").val("");
+                    $("#firingplans_add_input").hide();
+                    updateFireplanSubmenuState();
+                }
+            });
+            
+            $("#firingplans_menu_save").click(function(){
+                if (active_plan_id > -1) {
+                    var fp = newFireplanFromcurrent(firingplans[active_plan_id].name);
+                    firingplans[active_plan_id] = fp;
+                    updateFireplanSubmenuState();
+                    persist_firingplans();
+                }
+            });
+            
+            $("#firingplans_menu_del").click(function(){
+                if (active_plan_id > -1) {
+                    firingplans[active_plan_id] = null;
+                    $("#firingplans_plan_"+active_plan_id).remove();
+                    active_plan_id = -1;
+                    $("#firingplans_menu_btn").html("Firing plans");
+                }
+                updateFireplanSubmenuState();
+                persist_firingplans();
+            });
+            
+            
+             $("#firingplans_menu_btn").click(function(){
+                //console.log("Fireplan BTN clicked");
+                if ( active_plan_id > -1) {
+                    loadFiringplan(active_plan_id);
+                    updateFireplanSubmenuState();
+                }
+             });
         });
     </script>
 </body>
